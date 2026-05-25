@@ -21,7 +21,7 @@ on:
 
 env:
   server_repo: ${{ inputs.tachidesk_release_type == 'stable' && 'Suwayomi-Server' || 'Suwayomi-Server-preview' }}
-  test_image_tag: ghcr.io/suwayomi/suwayomi-server-test:testing
+  test_image_tag: ghcr.io/korason7117/suwayomi-server-test:testing
   this_actions_run_url: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
 
 jobs:
@@ -51,7 +51,7 @@ jobs:
       - name: Get latest release metadata
         id: get_latest_release_metadata
         run: |
-          curl -s https://api.github.com/repos/suwayomi/${{ env.server_repo }}/releases/latest > ${{ runner.temp }}/latest_release.json
+          curl -s https://api.github.com/repos/korason7117/${{ env.server_repo }}/releases/latest > ${{ runner.temp }}/latest_release.json
           release_url=$(jq -r '.assets[] | select(.content_type == "application/java-archive") | .browser_download_url' ${{ runner.temp }}/latest_release.json)
           release_tag=$(jq -r '.tag_name' ${{ runner.temp }}/latest_release.json)
           release_filename=$(basename $release_url)
@@ -229,17 +229,17 @@ jobs:
             TACHIDESK_DOCKER_GIT_COMMIT=${{ steps.get_latest_release_metadata.outputs.tachidesk_docker_git_commit }}
             TACHIDESK_KCEF=
             TACHIDESK_KCEF_RELEASE_URL=https://api.github.com/repos/JetBrains/JetBrainsRuntime/releases/tags/${{ steps.get_latest_release_metadata.outputs.jbr_release_tag }}
-            TACHIDESK_ABORT_HANDLER_DOWNLOAD_URL=https://raw.githubusercontent.com/Suwayomi/Suwayomi-Server/refs/heads/master/scripts/resources/catch_abort.c
+            TACHIDESK_ABORT_HANDLER_DOWNLOAD_URL=https://raw.githubusercontent.com/korason7117/Suwayomi-Server/refs/heads/master/scripts/resources/catch_abort.c
           tags: |
-            ${{ inputs.tachidesk_release_type == 'stable' && 'ghcr.io/suwayomi/tachidesk:latest' || '' }}
-            ghcr.io/suwayomi/tachidesk:${{ inputs.tachidesk_release_type }}
-            ghcr.io/suwayomi/tachidesk:${{ steps.get_latest_release_metadata.outputs.release_tag }}
-            ${{ inputs.tachidesk_release_type == 'stable' && 'ghcr.io/suwayomi/suwayomi-server:latest' || '' }}
-            ghcr.io/suwayomi/suwayomi-server:${{ inputs.tachidesk_release_type }}
-            ghcr.io/suwayomi/suwayomi-server:${{ steps.get_latest_release_metadata.outputs.release_tag }}
-            ghcr.io/suwayomi/suwayomi-server:${{ steps.get_latest_release_metadata.outputs.release_tag }}-${{ inputs.tachidesk_release_type }}
-          cache-from: type=registry,ref=ghcr.io/suwayomi/suwayomi-server:buildcache
-          cache-to: type=registry,ref=ghcr.io/suwayomi/suwayomi-server:buildcache,mode=max
+            ${{ inputs.tachidesk_release_type == 'stable' && 'ghcr.io/korason7117/tachidesk:latest' || '' }}
+            ghcr.io/korason7117/tachidesk:${{ inputs.tachidesk_release_type }}
+            ghcr.io/korason7117/tachidesk:${{ steps.get_latest_release_metadata.outputs.release_tag }}
+            ${{ inputs.tachidesk_release_type == 'stable' && 'ghcr.io/korason7117/suwayomi-server:latest' || '' }}
+            ghcr.io/korason7117/suwayomi-server:${{ inputs.tachidesk_release_type }}
+            ghcr.io/korason7117/suwayomi-server:${{ steps.get_latest_release_metadata.outputs.release_tag }}
+            ghcr.io/korason7117/suwayomi-server:${{ steps.get_latest_release_metadata.outputs.release_tag }}-${{ inputs.tachidesk_release_type }}
+          cache-from: type=registry,ref=ghcr.io/korason7117/suwayomi-server:buildcache
+          cache-to: type=registry,ref=ghcr.io/korason7117/suwayomi-server:buildcache,mode=max
 
       # - name: Create slim container
       #   uses: kitabisa/docker-slim-action@v1
