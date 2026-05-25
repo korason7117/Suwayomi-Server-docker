@@ -13,11 +13,6 @@ on:
         default: true
         description: 'Should the image be uploaded to the registry?'
         type: boolean
-    secrets:
-      DISCORD_TACHIDESK_WEBHOOK_ID:
-        required: false
-      DISCORD_TACHIDESK_TOKEN:
-        required: false
 
 env:
   server_repo: ${{ inputs.tachidesk_release_type == 'stable' && 'Suwayomi-Server' || 'Suwayomi-Server-preview' }}
@@ -30,7 +25,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
         with:
           # We want a full clone of the repo so that the rev-list count below is correct
           fetch-depth: 0
@@ -105,12 +100,6 @@ jobs:
               cat ${{ runner.temp }}/tachidesk.log
               echo "=============================="
               echo "Did not find Suwayomi-Server in server response: ${val}"
-              if [[ $DO_UPLOAD == "true" ]]; then
-                  curl \
-                    -F 'payload_json={"username": "Github", "content": "<@199705443789045771>\nDocker ${{ inputs.tachidesk_release_type }} image dry run failed! 😢 Version - ${{ steps.get_latest_release_metadata.outputs.release_tag }}. [See the full run log](${{ env.this_actions_run_url }})"}' \
-                    -F "file1=@${{ runner.temp }}/tachidesk.log" \
-                    "https://discord.com/api/webhooks/${{ secrets.DISCORD_TACHIDESK_WEBHOOK_ID }}/${{ secrets.DISCORD_TACHIDESK_TOKEN }}"
-              fi
               exit 1
             fi
 
@@ -204,12 +193,6 @@ jobs:
             cat ${{ runner.temp }}/tachidesk_env_vars.log
             echo "=============================="
             echo "Did not find Suwayomi-Server in server response: ${val_env_vars}"
-            if [[ $DO_UPLOAD == "true" ]]; then
-                curl \
-                  -F 'payload_json={"username": "Github", "content": "<@199705443789045771>\nDocker ${{ inputs.tachidesk_release_type }} image dry run failed! 😢 Version - ${{ steps.get_latest_release_metadata.outputs.release_tag }}. [See the full run log](${{ env.this_actions_run_url }})"}' \
-                  -F "file1=@${{ runner.temp }}/tachidesk_env_vars.log" \
-                  "https://discord.com/api/webhooks/${{ secrets.DISCORD_TACHIDESK_WEBHOOK_ID }}/${{ secrets.DISCORD_TACHIDESK_TOKEN }}"
-            fi
             exit 1
           fi
 
@@ -257,16 +240,6 @@ jobs:
           #   docker tag ghcr.io/suwayomi/suwayomi-server:${{ inputs.tachidesk_release_type }}-slim ghcr.io/suwayomi/suwayomi-server:latest-slim
           # fi
           # docker image push "ghcr.io/suwayomi/suwayomi-server" --all-tags
-
-      - name: Send a Discord message through the webhook (preview build)
-        if: inputs.do_upload && inputs.tachidesk_release_type == 'preview'
-        run: |
-          curl -H "Content-Type: application/json" -d '{"content": "Docker Preview Image Published!","embeds":[{"color":16729344,"author":{"name":"${{ github.repository_owner }}","icon_url":"https://avatars.githubusercontent.com/u/81182076","url":"https://github.com/${{ github.repository_owner }}"},"title":"Docker Preview Release","url":"https://github.com/${{ github.repository_owner }}/Suwayomi-Server-docker","fields":[{"name":"docker update","value":"docker pull ghcr.io/suwayomi/suwayomi-server:preview","inline":false},{"name":"docker run","value":"docker run -p 4567:4567 ghcr.io/suwayomi/suwayomi-server:preview","inline":false}],"thumbnail":{"url": "https://www.docker.com/sites/default/files/d8/2019-07/vertical-logo-monochromatic.png"},"description":"Suwayomi-Server version - ${{ steps.get_latest_release_metadata.outputs.release_tag }}"}]}' "https://discord.com/api/webhooks/${{ secrets.DISCORD_TACHIDESK_WEBHOOK_ID }}/${{ secrets.DISCORD_TACHIDESK_TOKEN }}"
-
-      - name: Send a Discord message through the webhook (stable build)
-        if: inputs.do_upload && inputs.tachidesk_release_type == 'stable'
-        run: |
-          curl -H "Content-Type: application/json" -d '{"content": "Docker Stable Image Published!","embeds":[{"color":5409028,"author":{"name":"${{ github.repository_owner }}","icon_url":"https://avatars.githubusercontent.com/u/81182076","url":"https://github.com/${{ github.repository_owner }}"},"title":"Docker Stable Release","url":"https://github.com/${{ github.repository_owner }}/Suwayomi-Server-docker","fields":[{"name":"docker update","value":"docker pull ghcr.io/suwayomi/suwayomi-server:stable","inline":false},{"name":"docker run","value":"docker run -p 4567:4567 ghcr.io/suwayomi/suwayomi-server","inline":false}],"thumbnail":{"url": "https://www.docker.com/sites/default/files/d8/2019-07/vertical-logo-monochromatic.png"},"description":"Suwayomi-Server version - ${{ steps.get_latest_release_metadata.outputs.release_tag }}"}]}' "https://discord.com/api/webhooks/${{ secrets.DISCORD_TACHIDESK_WEBHOOK_ID }}/${{ secrets.DISCORD_TACHIDESK_TOKEN }}"
 
       - name: Save tag (stable build)
         if: inputs.do_upload && inputs.tachidesk_release_type == 'stable'
