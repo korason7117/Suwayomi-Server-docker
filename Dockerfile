@@ -78,9 +78,9 @@ ARG TACHIDESK_FILENAME
 ARG TACHIDESK_DOCKER_GIT_COMMIT
 LABEL maintainer="suwayomi" \
       org.opencontainers.image.title="Suwayomi Docker" \
-      org.opencontainers.image.authors="https://github.com/suwayomi" \
-      org.opencontainers.image.url="https://github.com/suwayomi/docker-tachidesk/pkgs/container/tachidesk" \
-      org.opencontainers.image.source="https://github.com/suwayomi/docker-tachidesk" \
+      org.opencontainers.image.authors="https://github.com/korason7117" \
+      org.opencontainers.image.url="https://github.com/korason7117/Suwayomi-Server-docker/pkgs/container/tachidesk" \
+      org.opencontainers.image.source="https://github.com/korason7117/Suwayomi-Server-docker" \
       org.opencontainers.image.description="This image is used to start suwayomi server in a container" \
       org.opencontainers.image.vendor="suwayomi" \
       org.opencontainers.image.created=$BUILD_DATE \
